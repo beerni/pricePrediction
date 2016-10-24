@@ -4,9 +4,16 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static int selection;
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_BLACK = "\u001B[30m";
+    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_YELLOW = "\u001B[33m";
+    private static final String ANSI_BLUE = "\u001B[34m";
+    private static final String ANSI_PURPLE = "\u001B[35m";
+    private static final String ANSI_CYAN = "\u001B[36m";
+    private static final String ANSI_WHITE = "\u001B[37m";
+    private static int selection;
 
     private static int menu() {
 
@@ -39,18 +46,16 @@ public class Main {
                     case -1:
                         break;
                     case 1:
-                        // Perform "original number" case.
                         System.out.println("Option 1");
                         break;
                     case 2:
-                        // Perform "encrypt number" case.
                         System.out.println("Option 2");
                         break;
                     case 3:
-                        // Perform "decrypt number" case.
                         System.out.println("Option 3");
                         break;
                     default:
+                        if (userChoice!=4)
                         System.out.println("This option is not available");
                     }
 
