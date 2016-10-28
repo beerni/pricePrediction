@@ -6,19 +6,14 @@ import java.util.Random;
 import java.util.Scanner;
 
 import weka.classifiers.Evaluation;
-import weka.classifiers.trees.m5.PreConstructedLinearModel;
-import weka.core.Debug;
 import weka.core.Instances;
 
 import java.io.FileReader;
-import java.util.function.IntBinaryOperator;
 
 import weka.classifiers.functions.LinearRegression;
-import weka.core.SystemInfo;
-import weka.core.Utils;
+
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
-import weka.filters.unsupervised.attribute.StringToNominal;
 import weka.filters.unsupervised.instance.RemoveWithValues;
 
 public class Main {
@@ -30,19 +25,19 @@ public class Main {
     private static final String ANSI_BLUE = "\u001B[34m";
     private static final String ANSI_PURPLE = "\u001B[35m";
     private static final String ANSI_CYAN = "\u001B[36m";
-    private static final String ANSI_WHITE = "\u001B[37m";
 
     private static int menu() {
         int selection;
         Scanner input = new Scanner(System.in);
         System.out.println(ANSI_CYAN + "  __             _   ____       _          \n" + ANSI_RESET +
                 " / _| ___   ___ | |_|  _ \\ _ __(_) ___ ___ \n" + ANSI_GREEN +
-                "| |_ / _ \\ / _ \\| __| |_) | '__| |/ __/ _ \\\n" + ANSI_RESET +
-                "|  _| (_) | (_) | |_|  __/| |  | | (_|  __/\n" + ANSI_RED +
-                "|_|  \\___/ \\___/ \\__|_|   |_|  |_|\\___\\___|\n" + ANSI_RESET +
+                "| |_ / _ \\ /" + ANSI_YELLOW + " _ \\| " + ANSI_RED + "__| |_) | '__| |/ __/ _ \\\n" + ANSI_RESET +
+                "|  _| (_) | " + ANSI_BLACK + "(_) | |_|  __/| |" + ANSI_PURPLE + "  | | (_|  __/\n" + ANSI_RED +
+                "|_|  \\___/ \\___/" + ANSI_BLUE + " \\__|_|   |_|  |_|\\___\\___|\n" + ANSI_RESET +
                 "                                           \n");
-        System.out.println("1 - Linear Regression ");
-        System.out.println("2 - Option 2");
+        System.out.println("Select an option of the beyond menu ---> \n");
+        System.out.println("1 - Calculates the price equation according to a given position");
+        System.out.println("2 - What player do you need?");
         System.out.println("3 - Option 3");
         System.out.println("4 - Quit");
         System.out.println("-------------------------\n");
@@ -99,13 +94,29 @@ public class Main {
             remove2.setInputFormat(newData2);
             data = Filter.useFilter(newData2, remove2);
         }
+
+        //If is a D or S remove AerialsWon attribute
+        if (position.equals("D") || position.equals("S")) {
+            String[] assists = new String[2];
+            assists[0] = "-R";
+            assists[1] = "11";
+            Remove remove2 = new Remove();
+            remove2.setOptions(assists);
+            remove2.setInputFormat(newData2);
+            data = Filter.useFilter(newData2, remove2);
+        }
+
+        //If is a M do not delete anything
+        if (position.equals("M")) {
+            data = newData2;
+        }
+
         //Train classifier
-        System.out.println(data);
         LinearRegression lr = new LinearRegression();
         Evaluation eval = new Evaluation(data);
         lr.buildClassifier(data);
         eval.crossValidateModel(lr, data, 10, new Random(1));
-        System.out.println(lr.getAttributeSelectionMethod());
+        System.out.println(lr);
         System.out.println("Type any to return to the main menu\n");
         Scanner exit = new Scanner(System.in);
         String any = exit.next();
@@ -145,23 +156,26 @@ public class Main {
                     if (position.equals("GK") || position.equals("D") || position.equals("M") || position.equals("S")) {
                         buildLinearModel(nominalIndices(position), position);
                     } else {
-                        System.out.println("Please introduce a valid position or enter exit skip (GK, D, M or S)?\n");
+                        System.out.println("Please introduce a valid position or enter exit to skip (GK, D, M or S)?\n");
                         String next = scan.next();
-                        if (next.equals("exit")) {
+                        next = next.toUpperCase();
+
+                        if (next.equals("EXIT")) {
                             break;
                         } else if (next.equals("GK") || next.equals("D") || next.equals("M") || next.equals("S"))
                             buildLinearModel(nominalIndices(next), next);
                         else {
                             do {
-                                System.out.println("Please introduce a valid position or enter exit skip (GK, D, M or S)?\n");
+                                System.out.println("Please introduce a valid position or enter exit to skip (GK, D, M or S)?\n");
                                 rep = scan.next();
-                                if (rep.equals("exit"))
+                                rep = rep.toUpperCase();
+
+                                if (rep.equals("EXIT"))
                                     break;
                                 buildLinearModel(nominalIndices(rep), rep);
                             }
                             while (!rep.equals("GK") || !rep.equals("D") || !rep.equals("M") || !rep.equals("S"));
                         }
-
                     }
                     break;
                 case 2:
@@ -174,7 +188,6 @@ public class Main {
                     if (userChoice != 4)
                         System.out.println("This option is not available");
             }
-
         }
         while (userChoice != 4);
     }
