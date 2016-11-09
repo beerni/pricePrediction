@@ -12,6 +12,7 @@ import java.io.FileReader;
 
 import weka.classifiers.functions.LinearRegression;
 
+import weka.core.SystemInfo;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.instance.RemoveWithValues;
@@ -117,11 +118,94 @@ public class Main {
         lr.buildClassifier(data);
         eval.crossValidateModel(lr, data, 10, new Random(1));
         System.out.println(lr);
-        System.out.println("Type any to return to the main menu\n");
+        double [] lmCoeffs = lr.coefficients();
+        System.out.println("\nDo you want to calculate the price of the player? (Y/any)\n");
         Scanner exit = new Scanner(System.in);
         String any = exit.next();
+        any = any.toUpperCase();
+        double finalPrice;
+        if(any.equals("Y")){
+            if (position.equals("GK")){
+                double mins, redCards, pass, aerialsWon, MoTm;
+                Scanner inputs = new Scanner(System.in);
+                System.out.println("\nIntroduce the minutes\n");
+                mins = inputs.nextDouble();
+                System.out.println("\nIntroduce the red cards\n");
+                redCards = inputs.nextDouble();
+                System.out.println("\nIntroduce the passes\n");
+                pass = inputs.nextDouble();
+                System.out.println("\nIntroduce the aerials won\n");
+                aerialsWon = inputs.nextDouble();
+                System.out.println("\nIntroduce the number of Man of the match\n");
+                MoTm = inputs.nextDouble();
+                finalPrice = (mins * lmCoeffs[5])+ (redCards * lmCoeffs[8])+(pass * lmCoeffs[10])+(aerialsWon * lmCoeffs[11])+(MoTm * lmCoeffs[12]) + lmCoeffs[15];
+                System.out.println("\nFinal price: "+Math.abs(finalPrice));
 
+            }
+            else if (position.equals("D")){
+                double age, apps, assists, redCard, passes, rating;
+                Scanner inputs = new Scanner(System.in);
+                System.out.println("\nIntroduce the Age\n");
+                age = inputs.nextDouble();
+                System.out.println("\nIntroduce the apps\n");
+                apps = inputs.nextDouble();
+                System.out.println("\nIntroduce the assists\n");
+                assists = inputs.nextDouble();
+                System.out.println("\nIntroduce the red cards \n");
+                redCard = inputs.nextDouble();
+                System.out.println("\nIntroduce the passes\n");
+                passes = inputs.nextDouble();
+                System.out.println("\nIntroduce the rating\n");
+                rating = inputs.nextDouble();
+                finalPrice = (age * lmCoeffs[0])+ (apps * lmCoeffs[4])+(assists * lmCoeffs[7])+(redCard * lmCoeffs[9])+(passes * lmCoeffs[11])+(rating * lmCoeffs[13]) + lmCoeffs[15];
+                System.out.println("\nFinal price: "+Math.abs(finalPrice));
 
+            }
+            else if (position.equals("M")){
+                double ageM, appsM, minsM, AssistsM, yellowM, passM, ratingM;
+                Scanner inputs = new Scanner(System.in);
+                System.out.println("\nIntroduce the age\n");
+                ageM = inputs.nextDouble();
+                System.out.println("\nIntroduce the apps\n");
+                appsM = inputs.nextDouble();
+                System.out.println("\nIntroduce the minutes\n");
+                minsM = inputs.nextDouble();
+                System.out.println("\nIntroduce the assists\n");
+                AssistsM = inputs.nextDouble();
+                System.out.println("\nIntroduce the yellow cards\n");
+                yellowM = inputs.nextDouble();
+                System.out.println("\nIntroduce the passes \n");
+                passM = inputs.nextDouble();
+                System.out.println("\nIntroduce the rating\n");
+                ratingM = inputs.nextDouble();
+                finalPrice = (ageM * lmCoeffs[0])+ (appsM * lmCoeffs[4])+(minsM * lmCoeffs[5])+(AssistsM * lmCoeffs[7])+(yellowM * lmCoeffs[8])+(passM * lmCoeffs[11])+(ratingM * lmCoeffs[14]) + lmCoeffs[16];
+                System.out.println("\nFinal price: "+Math.abs(finalPrice));
+
+            }
+            else if (position.equals("S")){
+                double ageS, appsS, minsS, goals, assistsS, passS, motmS, ratingS;
+                Scanner inputs = new Scanner(System.in);
+                System.out.println("\nIntroduce the age\n");
+                ageS = inputs.nextDouble();
+                System.out.println("\nIntroduce the apps\n");
+                appsS = inputs.nextDouble();
+                System.out.println("\nIntroduce the minutes\n");
+                minsS = inputs.nextDouble();
+                System.out.println("\nIntroduce the goals\n");
+                goals = inputs.nextDouble();
+                System.out.println("\nIntroduce the assists\n");
+                assistsS = inputs.nextDouble();
+                System.out.println("\nIntroduce the passes\n");
+                passS = inputs.nextDouble();
+                System.out.println("\nIntroduce the Man of the matches\n");
+                motmS = inputs.nextDouble();
+                System.out.println("\nIntroduce the rating\n");
+                ratingS = inputs.nextDouble();
+                finalPrice = (ageS * lmCoeffs[0])+ (appsS * lmCoeffs[4])+(minsS * lmCoeffs[5])+(goals * lmCoeffs[6])+(assistsS * lmCoeffs[7])+(passS * lmCoeffs[11])+(motmS * lmCoeffs[12])+(ratingS * lmCoeffs[13]) + lmCoeffs[15];
+                System.out.println("\nFinal price: "+Math.abs(finalPrice));
+
+            }
+        }
     }
 
     private static String nominalIndices(String position) {
