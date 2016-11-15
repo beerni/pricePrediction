@@ -1,11 +1,14 @@
 package com.weka.price.cities;
 
 import java.io.BufferedReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 
 import weka.classifiers.Evaluation;
+import weka.classifiers.trees.J48;
 import weka.core.Instances;
 
 import java.io.FileReader;
@@ -14,8 +17,11 @@ import weka.classifiers.functions.LinearRegression;
 
 import weka.core.SystemInfo;
 import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Discretize;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.instance.RemoveWithValues;
+import weka.gui.treevisualizer.*;
+
 
 public class Main {
     private static final String ANSI_RESET = "\u001B[0m";
@@ -221,6 +227,240 @@ public class Main {
         return nominalIndices;
     }
 
+    private static void findTreePath(Node node, double shots, double goals, double rating, double mins, double pass){
+        Edge edgeToChild;
+        int i = 0;
+        boolean check=false;
+
+        if (node.getChild(0)==null){
+            System.out.println("You need the position: " + node.getLabel());
+            check=true;
+        }
+        if(check==false){
+            while((edgeToChild=node.getChild(i))!=null){
+                if(node.getLabel().equals("Shots")){
+                    String[] partes = edgeToChild.getLine(0).split(" ");
+                    String[] partes2 = partes[1].split("\\(");
+                    if (partes2[1].indexOf('i') >= 0) {
+                        String[] particion = partes2[1].split("-");
+                        if(particion.length==3){
+                            String[] particion2 = particion[2].split("\\]");
+                            Double parte = Double.parseDouble(particion2[0]);
+                            if(shots<parte){
+                                node = edgeToChild.getTarget();
+                                i=-1;
+                            }
+                        }else{
+                            Double parte = Double.parseDouble(particion[0]);
+                            if(shots>parte){
+                                node = edgeToChild.getTarget();
+                                i=-1;
+                            }
+                        }
+                    } else {
+                        String[] partes3 = partes2[1].split("-");
+                        double part = Double.parseDouble(partes3[0]);
+                        String[] partes4 = partes3[1].split("\\]'");
+                        double part2 = Double.parseDouble(partes4[0]);
+                        if (part < shots && shots <= part2) {
+                            node = edgeToChild.getTarget();
+                            i=-1;
+                        }
+                    }
+                }
+                else if(node.getLabel().equals("Goals")) {
+                    String[] partes = edgeToChild.getLine(0).split(" ");
+                    String[] partes2 = partes[1].split("\\(");
+                    if (partes2[1].indexOf('i') >= 0) {
+                        String[] particion = partes2[1].split("-");
+                        if(particion.length==3){
+                            String[] particion2 = particion[2].split("\\]");
+                            Double parte = Double.parseDouble(particion2[0]);
+                            if(goals<parte){
+                                node = edgeToChild.getTarget();
+                                i=-1;
+                            }
+                        }else{
+                            Double parte = Double.parseDouble(particion[0]);
+                            if(goals>parte){
+                                node = edgeToChild.getTarget();
+                                i=-1;
+                            }
+                        }
+                    } else {
+                        String[] partes3 = partes2[1].split("-");
+                        double part = Double.parseDouble(partes3[0]);
+                        String[] partes4 = partes3[1].split("\\]'");
+                        double part2 = Double.parseDouble(partes4[0]);
+                        if (part < goals && goals <= part2) {
+                            node = edgeToChild.getTarget();
+                            i=-1;
+                        }
+                    }
+                }
+                else if(node.getLabel().equals("Rating")){
+                    String[] partes = edgeToChild.getLine(0).split(" ");
+                    String[] partes2 = partes[1].split("\\(");
+                    if (partes2[1].indexOf('i') >= 0) {
+                        String[] particion = partes2[1].split("-");
+                        if(particion.length==3){
+                            String[] particion2 = particion[2].split("\\]");
+                            Double parte = Double.parseDouble(particion2[0]);
+                            if(rating<parte){
+                                node = edgeToChild.getTarget();
+                                i=-1;
+                            }
+                        }else{
+                            Double parte = Double.parseDouble(particion[0]);
+                            if(rating>parte){
+                                node = edgeToChild.getTarget();
+                                i=-1;
+                            }
+                        }
+                    } else {
+                        String[] partes3 = partes2[1].split("-");
+                        double part = Double.parseDouble(partes3[0]);
+                        String[] partes4 = partes3[1].split("\\]'");
+                        double part2 = Double.parseDouble(partes4[0]);
+                        if (part < rating && rating <= part2) {
+                            node = edgeToChild.getTarget();
+                            i=-1;
+                        }
+                    }
+                }
+                else if(node.getLabel().equals("Pass")){
+                    String[] partes = edgeToChild.getLine(0).split(" ");
+                    String[] partes2 = partes[1].split("\\(");
+                    if (partes2[1].indexOf('i') >= 0) {
+                        String[] particion = partes2[1].split("-");
+                        if(particion.length==3){
+                            String[] particion2 = particion[2].split("\\]");
+                            Double parte = Double.parseDouble(particion2[0]);
+                            if(pass<parte){
+                                node = edgeToChild.getTarget();
+                                i=-1;
+                            }
+                        }else{
+                            Double parte = Double.parseDouble(particion[0]);
+                            if(pass>parte){
+                                node = edgeToChild.getTarget();
+                                i=-1;
+                            }
+                        }
+                    } else {
+                        String[] partes3 = partes2[1].split("-");
+                        double part = Double.parseDouble(partes3[0]);
+                        String[] partes4 = partes3[1].split("\\]'");
+                        double part2 = Double.parseDouble(partes4[0]);
+                        if (pass < goals && pass <= part2) {
+                            node = edgeToChild.getTarget();
+                            i=-1;
+                        }
+                    }
+                }
+                else if (node.getLabel().equals("Mins")){
+                    String[] partes = edgeToChild.getLine(0).split(" ");
+                    String[] partes2 = partes[1].split("\\(");
+                    if (partes2[1].indexOf('i') >= 0) {
+                        String[] particion = partes2[1].split("-");
+                        if(particion.length==3){
+                            String[] particion2 = particion[2].split("\\]");
+                            Double parte = Double.parseDouble(particion2[0]);
+                            if(mins<parte){
+                                node = edgeToChild.getTarget();
+                                i=-1;
+                            }
+                        }else{
+                            Double parte = Double.parseDouble(particion[0]);
+                            if(mins>parte){
+                                node = edgeToChild.getTarget();
+                                i=-1;
+                            }
+                        }
+                    } else {
+                        String[] partes3 = partes2[1].split("-");
+                        double part = Double.parseDouble(partes3[0]);
+                        String[] partes4 = partes3[1].split("\\]'");
+                        double part2 = Double.parseDouble(partes4[0]);
+                        if (part < mins && mins <= part2) {
+                            node = edgeToChild.getTarget();
+                            i=-1;
+                        }
+                    }
+                }
+                i++;
+            }
+            if(node.getChild(0)==null) {
+                String[] label = node.getLabel().split(" ");
+                System.out.println("You need the position: " + label[0]);
+            }
+        }
+
+    }
+
+    private static void J48Tree(double shots, double goals, double rating, double mins, double pass) throws Exception {
+        BufferedReader trainingData = new BufferedReader(new FileReader("C:/Users/Admin/Desktop/dataset2.arff"));
+        Instances train = new Instances(trainingData);
+        trainingData.close();
+        train.setClassIndex(train.numAttributes() - 1);
+
+        String[] options = new String[2];
+        options[0] = "-R";
+        options[1] = "1,2,3,6,15, 16";
+        Remove remove = new Remove();
+        remove.setOptions(options);
+        remove.setInputFormat(train);
+
+        Instances finalData = Filter.useFilter(train, remove);
+
+        String[] optionsDis = new String[6];
+        optionsDis[0] = "-B";
+        optionsDis[1] = "10";
+        optionsDis[2] = "-M";
+        optionsDis[3] = "-1.0";
+        optionsDis[4] = "-R";
+        optionsDis[5] = "first-last";
+        Discretize discretize = new Discretize();
+        discretize.setOptions(optionsDis);
+        discretize.setInputFormat(finalData);
+
+        Instances finalData2 = Filter.useFilter(finalData, discretize);
+
+        J48 j48 = new J48();
+
+        j48.buildClassifier(finalData2);
+
+        Reader treeDot = new StringReader(j48.graph());
+        TreeBuild treeBuild = new TreeBuild();
+        Node treeRoot = treeBuild.create(treeDot);
+
+
+        findTreePath(treeRoot, shots, goals, rating, mins, pass);
+
+        System.out.println("Type any to return to the main menu\n");
+        Scanner exit = new Scanner(System.in);
+        String any = exit.next();
+        /*
+        // display classifier
+        final javax.swing.JFrame jf =
+                new javax.swing.JFrame("Weka Classifier Tree Visualizer: J48");
+        jf.setSize(500,400);
+        jf.getContentPane().setLayout(new BorderLayout());
+        TreeVisualizer tv = new TreeVisualizer(null,
+                j48.graph(),
+                new PlaceNode2());
+        jf.getContentPane().add(tv, BorderLayout.CENTER);
+        jf.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                jf.dispose();
+            }
+        });
+
+        jf.setVisible(true);
+        tv.fitToScreen();
+        */
+    }
+
     public static void main(String[] args) throws Exception {
         int userChoice;
         Scanner scan = new Scanner(System.in);
@@ -263,8 +503,125 @@ public class Main {
                     }
                     break;
                 case 2:
-                    System.out.println("Option 2");
-                    break;
+                    boolean error=true;
+                    double shoots = 0;
+                    double gooal = 0;
+                    double miins = 0;
+                    double raating = 0;
+                    double paases = 0;
+                    while (error) {
+                        System.out.println("How many goals would you like your player do in the future?\n");
+                        String goals = scan.next();
+                        goals = goals.toUpperCase();
+                        try {
+                            double goalsInt = Double.parseDouble(goals);
+                            if(0<=goalsInt){
+                                error = false;
+                                gooal = goalsInt;
+                            }
+                            else{
+                                System.out.println("Write a number bigger than 0");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Please write a valid number\n");
+                            error = true;
+                        }
+                        if(!error) {
+                            error=false;
+                        }
+                    }
+                    error=true;
+                    while (error) {
+                        System.out.println("How many shots would you like your player do in the future?\n");
+                        String shots = scan.next();
+                        shots = shots.toUpperCase();
+                        try {
+                            double shotsInt = Double.parseDouble(shots);
+                            if(0<=shotsInt){
+                                error = false;
+                                shoots=shotsInt;
+                            }
+                            else{
+                                System.out.println("Write a number bigger than 0");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Please write a valid number\n");
+                            error = true;
+                        }
+                        if(!error) {
+                            error=false;
+                        }
+                    }
+                    error=true;
+                    while (error) {
+                        System.out.println("What is the rating you expect from the player?\n");
+                        String rating = scan.next();
+                        rating = rating.toUpperCase();
+                        try {
+                            double ratingInt = Double.parseDouble(rating);
+                            if(0<=ratingInt){
+                                if(ratingInt<=10) {
+                                    error = false;
+                                    raating = ratingInt;
+                                }
+                                else{
+                                    System.out.println("Write a number smaller than 10");
+                                }
+                            }
+                            else{
+                                System.out.println("Write a number bigger than 0");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Please write a valid number\n");
+                            error = true;
+                        }
+                        if(!error) {
+                            error=false;
+                        }
+                    }
+                    error=true;
+                    while (error) {
+                        System.out.println("How many minutes would you like your player do in the future?\n");
+                        String minutes = scan.next();
+                        minutes = minutes.toUpperCase();
+                        try {
+                            double minInt = Double.parseDouble(minutes);
+                            if (0 <= minInt) {
+                                error = false;
+                                miins = minInt;
+                            } else {
+                                System.out.println("Write a number bigger than 0");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Please write a valid number\n");
+                            error = true;
+                        }
+                        if (!error) {
+                            error = false;
+                        }
+                    }
+                    error=true;
+                    while (error) {
+                        System.out.println("How many passes would you like your player do in the future?\n");
+                        String passes = scan.next();
+                        passes = passes.toUpperCase();
+                        try {
+                            double passInt = Double.parseDouble(passes);
+                            if (0 <= passInt) {
+                                error = false;
+                                paases = passInt;
+                            } else {
+                                System.out.println("Write a number bigger than 0");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Please write a valid number\n");
+                            error = true;
+                        }
+                        if (!error) {
+                            error = false;
+                        }
+                    }
+                    J48Tree(shoots, gooal, raating, miins,paases);                    break;
                 case 3:
                     System.out.println("Option 3");
                     break;
